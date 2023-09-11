@@ -85,15 +85,16 @@ export default function Client() {
         // event.defaultPrevented();
         const params = [{
             gas: Number(21000).toString(16),
-            gasPrice: Number(5).toString(16),
+            gasPrice: Number(250000).toString(16),
             from: coinAddress,
-            to: "0xEA2cBB9e716808C22AfDef7F8e5E25A4C0e262F6",
-            value: Number(10).toString(16)
+            to: process.env.CONTRACT_ADDRESS,
+            value: Number(1).toString(16)
         }]
 
         const res = await window.ethereum.request({method: 'eth_sendTransaction', params }).catch((err) => console.log(err))
 
 
+        setAccess(true)
         console.log(res)
 
     }
@@ -112,9 +113,7 @@ export default function Client() {
             {access ?
                     <div className={styles.main}>
                         <form onSubmit={performTransaction} className={styles.main}>
-                            <br/>
-                            <input type="text" name="to_receipient" placeholder="receipient:"/>
-                            <button type="submit"> Send </button>
+                            <button type="submit"> Buy </button>
                         </form>
                     </div>
 
