@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  dev:
+    container_name: blockChainChallenge
+    image: node:19.8.1-alpine
+    build:
+      context: .
+      target: development
+      dockerfile: ./Dockerfile
+    command: sh -c "yarn install && yarn start:dev"
+    env_file:
+      - .env
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+      - '1103:1100'
+      - "32:25"
+      - "687:587"
+      - "265:465"
+    environment:
+      - GENERATE_SOURCEMAP=false
+      - NODE_OPTIONS=--max-old-space-size=16384
+    networks:
+      - blockchainNestJs
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+
+  mongo:
+    container_name: blockchain_mongo
+    image: mongo:latest
+    volumes:
+      - ./docker/database:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=blockchain
+    ports:
+      - "${MONGO_PORT}:27017"
+    networks:
+      - blockchainNestJs
+    restart: always
+
+  redis:
+    image: 'redis:alpine'
+    restart: always
+    container_name: blockchain_redis
+    ports:
+      - '${FORWARD_REDIS_PORT:-6379}:6379'
+    networks:
+      - blockchainNestJs
+    volumes:
+      - 'blockchainRedis:/data'
+
+  nginx:
+    image: nginx:alpine
+    container_name: blockchain_nginx
+    restart: unless-stopped
+    ports:
+      - "8008:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d/
+    networks:
+      - blockchainNestJs
+    depends_on:
+      - dev
+
+networks:
+  blockchainNestJs:
+    driver: bridge
+
+volumes:
+  blockchainRedis:
+    driver: local
