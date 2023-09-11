@@ -87,7 +87,7 @@ export default function Client() {
             gas: Number(21000).toString(16),
             gasPrice: Number(250000).toString(16),
             from: coinAddress,
-            to: process.env.CONTRACT_ADDRESS,
+            to: "0xEA2cBB9e716808C22AfDef7F8e5E25A4C0e262F6",
             value: Number(1).toString(16)
         }]
 
@@ -109,7 +109,7 @@ export default function Client() {
             <h1>Block Chain Code Challenge</h1>
             <br/>
             <br/>
-            <p>Your available Balance : {balance}</p>
+            {access ? <p>Your available Balance : {balance}</p> : <p></p> }
             {access ?
                     <div className={styles.main}>
                         <form onSubmit={performTransaction} className={styles.main}>
